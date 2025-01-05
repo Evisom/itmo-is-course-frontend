@@ -1,4 +1,5 @@
 "use client";
+
 import {
   createContext,
   useEffect,
@@ -31,8 +32,8 @@ const AuthContext = createContext<AuthContextProps>({
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [keycloak, setKeycloak] = useState<KeycloakInstance | null>(null);
-  const [authenticated, setAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [token, setToken] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
 
@@ -43,37 +44,56 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       clientId: config.KC_CLIENT_ID,
     });
 
-    kc.init({ onLoad: "check-sso", pkceMethod: "S256" })
+    kc.init({
+      onLoad: "check-sso",
+      silentCheckSsoRedirectUri: `${window.location.origin}/silent-check-sso.html`,
+      pkceMethod: "S256",
+      checkLoginIframe: true,
+    })
       .then((auth) => {
         setKeycloak(kc);
-        setAuthenticated(auth);
-        setLoading(false);
         if (auth) {
-          setToken(kc.token || null);
-          setUsername(kc.tokenParsed?.preferred_username || null);
-
-          // Обновление токена каждые 30 секунд
-          setInterval(() => {
-            kc.updateToken(30).then((refreshed) => {
-              if (refreshed) {
-                setToken(kc.token || null);
-                setUsername(kc.tokenParsed?.preferred_username || null);
-              }
-            });
-          }, 30000);
+          updateAuthState(kc, true);
+        } else {
+          // Если silent login не удался, не редиректим, просто устанавливаем состояние
+          setAuthenticated(false);
+          setLoading(false);
         }
       })
       .catch(() => {
+        setAuthenticated(false);
         setLoading(false);
       });
   }, []);
 
+  const updateAuthState = (kc: KeycloakInstance, auth: boolean) => {
+    setAuthenticated(auth);
+    setToken(kc.token || null);
+    setUsername(kc.tokenParsed?.preferred_username || null);
+
+    setLoading(false);
+
+    // Установка таймера для обновления токена
+    if (auth) {
+      setInterval(() => {
+        kc.updateToken(30).then((refreshed) => {
+          if (refreshed) {
+            setToken(kc.token || null);
+            setUsername(kc.tokenParsed?.preferred_username || null);
+          }
+        });
+      }, 30000);
+    }
+  };
+
   const login = () => {
-    keycloak?.login({ redirectUri: "http://localhost:3000" });
+    keycloak?.login({ redirectUri: window.location.origin });
   };
 
   const logout = () => {
-    keycloak?.logout({ redirectUri: "http://localhost:3000" });
+    keycloak?.logout({ redirectUri: window.location.origin });
+
+    // Очистка состояния
     setToken(null);
     setUsername(null);
     setAuthenticated(false);

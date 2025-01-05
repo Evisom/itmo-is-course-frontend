@@ -7,7 +7,8 @@ import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
-import { CssBaseline } from "@mui/material";
+import { Container, CssBaseline } from "@mui/material";
+import { Header } from "./components/Header";
 
 export default function RootLayout({
   children,
@@ -20,7 +21,15 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider>
+              <Header />
+              <Container
+                style={{ height: "100%", paddingTop: "78px" }}
+                maxWidth="xl"
+              >
+                {children}
+              </Container>
+            </AuthProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>
