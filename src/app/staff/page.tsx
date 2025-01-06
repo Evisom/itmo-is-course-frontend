@@ -10,7 +10,13 @@ const StaffPage = () => {
     return <Progress />;
   }
 
-  const librarianMethods = ["authors", "genres", "themes", "publishers"];
+  const librarianMethods = [
+    "authors",
+    "genres",
+    "themes",
+    "publishers",
+    "copies",
+  ];
 
   return (
     <>
@@ -30,6 +36,9 @@ const StaffPage = () => {
               Управление {method}
             </Button>
           ))}
+          <Button variant="outlined" href={`/staff/manage/book/new`}>
+            Управление книгами
+          </Button>
         </div>
         <div className="admin">
           <Typography className="h6">Действия администратора</Typography>

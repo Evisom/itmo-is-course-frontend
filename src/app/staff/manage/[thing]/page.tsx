@@ -12,8 +12,9 @@ import { Authors } from "./Authors";
 import { Genres } from "./Genres";
 import { Themes } from "./Themes";
 import { Publishers } from "./Publishers";
+import Copies from "./Copies";
 
-const ALLOWED_PARAMS = ["authors", "genres", "themes", "publishers"];
+const ALLOWED_PARAMS = ["authors", "genres", "themes", "publishers", "copies"];
 
 const ManagePage = ({ params }: { params: any }) => {
   const { thing } = React.use(params);
@@ -36,6 +37,7 @@ const ManagePage = ({ params }: { params: any }) => {
       {thing === "genres" && <Genres />}
       {thing === "themes" && <Themes />}
       {thing === "publishers" && <Publishers />}
+      {thing === "copies" && <Copies />}
     </div>
   );
 };
