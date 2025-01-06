@@ -25,6 +25,8 @@ import { config } from "@/app/utils/config";
 import "./page.scss";
 import { Authors } from "./Authors";
 import { Genres } from "./Genres";
+import { Themes } from "./Themes";
+import { Publishers } from "./Publishers";
 
 const ALLOWED_PARAMS = ["authors", "genres", "themes", "publishers"];
 
@@ -47,6 +49,8 @@ const ManagePage = ({ params }: { params: any }) => {
       <Typography variant="h4">{`Управление ${thing}`}</Typography>
       {thing === "authors" && <Authors />}
       {thing === "genres" && <Genres />}
+      {thing === "themes" && <Themes />}
+      {thing === "publishers" && <Publishers />}
     </div>
   );
 };
