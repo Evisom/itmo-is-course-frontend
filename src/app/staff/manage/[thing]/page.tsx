@@ -1,26 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
-import useSWR from "swr";
-import {
-  Card,
-  CardContent,
-  TextField,
-  Typography,
-  Button,
-} from "@mui/material";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-import { DateField } from "@mui/x-date-pickers/DateField";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { enUS } from "date-fns/locale";
+import { Typography } from "@mui/material";
 
 import { Progress } from "@/app/components/Progress";
-import { useAuth } from "@/app/components/AuthProvider";
 import { useRequireAuth } from "@/app/utils/useRequireAuth";
-import { fetcher } from "@/app/utils/fetcher";
-import { config } from "@/app/utils/config";
 
 import "./page.scss";
 import { Authors } from "./Authors";

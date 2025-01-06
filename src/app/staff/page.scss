@@ -1,4 +1,11 @@
 .actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  margin-top: 24px;
+  & > div {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 12px;
+  }
 }

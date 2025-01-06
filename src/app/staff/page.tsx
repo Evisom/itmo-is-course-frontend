@@ -1,5 +1,5 @@
 "use client";
-import { Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { Progress } from "../components/Progress";
 import { useRequireAuth } from "../utils/useRequireAuth";
 import "./page.scss";
@@ -10,6 +10,8 @@ const StaffPage = () => {
     return <Progress />;
   }
 
+  const librarianMethods = ["authors", "genres", "themes", "publishers"];
+
   return (
     <>
       <Typography variant="h4">Управление библиотекой</Typography>
@@ -19,6 +21,15 @@ const StaffPage = () => {
       <div className="actions">
         <div className="librarian">
           <Typography className="h6">Действия библиотекаря</Typography>
+          {librarianMethods.map((method) => (
+            <Button
+              variant="outlined"
+              key={method}
+              href={`/staff/manage/${method}`}
+            >
+              Управление {method}
+            </Button>
+          ))}
         </div>
         <div className="admin">
           <Typography className="h6">Действия администратора</Typography>
