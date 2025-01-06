@@ -12,7 +12,7 @@ const StaffPage = () => {
 
   return (
     <>
-      <Typography variant="h5">Управление библиотекой</Typography>
+      <Typography variant="h4">Управление библиотекой</Typography>
       <Typography variant="subtitle1">
         Вам доступен функционал {true && "администратора"}
       </Typography>

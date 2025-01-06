@@ -24,7 +24,7 @@ export default function RootLayout({
             <AuthProvider>
               <Header />
               <Container
-                style={{ height: "100%", paddingTop: "78px" }}
+                style={{ height: "100%", paddingTop: "92px" }}
                 maxWidth="xl"
               >
                 {children}
