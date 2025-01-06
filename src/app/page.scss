@@ -1,0 +1,21 @@
+.books {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 24px;
+}
+
+.results-controls {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: baseline;
+  & > * {
+    margin: 0 !important;
+  }
+}
+
+.MuiFormLabel-root {
+  z-index: 1;
+  background: white;
+}
