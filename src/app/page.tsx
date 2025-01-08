@@ -16,6 +16,9 @@ import {
   Box,
   Slider,
   FormControlLabel,
+  Grid,
+  CardMedia,
+  Link,
 } from "@mui/material";
 import useSWR from "swr";
 import { useAuth } from "./components/AuthProvider";
@@ -24,6 +27,7 @@ import { useRequireAuth } from "./utils/useRequireAuth";
 import { config } from "./utils/config";
 import { fetcher } from "./utils/fetcher";
 import "./page.scss";
+import BookCover from "./components/BookCover";
 
 export default function Home() {
   const { authenticated, loading } = useRequireAuth();
@@ -56,6 +60,11 @@ export default function Home() {
   );
   const { data: genresData } = useSWR(
     [`${config.API_URL}/library/genres`, token],
+    ([url, token]) => fetcher(url, token)
+  );
+
+  const { data: booksData } = useSWR(
+    [`${config.API_URL}/library/find`, token],
     ([url, token]) => fetcher(url, token)
   );
 
@@ -259,7 +268,54 @@ export default function Home() {
               Искать
             </Button>
           </div>
-          <div className="results-body">{JSON.stringify(filterState)}</div>
+          <div className="results-body">
+            {JSON.stringify(filterState)}
+
+            <Grid container spacing={2}>
+              {booksData?.map((book) => (
+                <Grid item xs={12} sm={6} md={4} key={book.id}>
+                  <Card>
+                    <Link
+                      href={`/book/${book.id}`}
+                      sx={{ textDecoration: "none" }}
+                    >
+                      <BookCover
+                        title={book.title}
+                        authors={book.authors.map(
+                          (author) => `${author.name} ${author.surname}`
+                        )}
+                        id={book.id}
+                      />
+                    </Link>
+                    <CardContent>
+                      <Typography variant="h6" component="div">
+                        {book.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Автор(ы):{" "}
+                        {book.authors.length > 0
+                          ? book.authors
+                              .map(
+                                (author) => `${author.name} ${author.surname}`
+                              )
+                              .join(", ")
+                          : "Не указан"}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Жанр: {book.genre?.name || "Не указан"}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Тема: {book.theme?.name || "Не указана"}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Издатель: {book.publisher?.name || "Не указан"}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </div>
         </div>
       </div>
     </div>
