@@ -63,19 +63,26 @@ const BookPage = ({ params }: { params: { id: string } }) => {
   const handleReserve = async (libraryId: number) => {
     setReserving(libraryId);
     try {
-      await fetch(`${config.API_URL}/operations/books/${id}/reserve`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ libraryId }),
-      });
-      setSnackbar({
-        open: true,
-        message: "Книга успешно забронирована",
-        severity: "success",
-      });
+      const status = await fetch(
+        `${config.API_URL}/operations/books/${id}/reserve`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ libraryId }),
+        }
+      );
+      if (status.status === 200) {
+        setSnackbar({
+          open: true,
+          message: "Книга успешно забронирована",
+          severity: "success",
+        });
+      } else {
+        throw new Error("Ошибка при бронировании");
+      }
     } catch (error) {
       console.error("Ошибка при бронировании:", error);
       setSnackbar({
