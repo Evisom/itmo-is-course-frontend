@@ -15,6 +15,7 @@ import { Publishers } from "./Publishers";
 import Copies from "./Copies";
 import Bookings from "./Bookings";
 import Return from "./Return";
+import LibraryManagementPage from "./Libraries";
 
 const ALLOWED_PARAMS = [
   "authors",
@@ -24,6 +25,7 @@ const ALLOWED_PARAMS = [
   "copies",
   "bookings",
   "return",
+  "libraries",
 ];
 
 const ManagePage = ({ params }: { params: any }) => {
@@ -50,6 +52,7 @@ const ManagePage = ({ params }: { params: any }) => {
       {thing === "copies" && <Copies />}
       {thing === "bookings" && <Bookings />}
       {thing === "return" && <Return />}
+      {thing === "libraries" && <LibraryManagementPage />}
     </div>
   );
 };
