@@ -16,6 +16,8 @@ import {
   TextField,
   Rating,
   Box,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { fetcher } from "@/app/utils/fetcher";
 import { config } from "@/app/utils/config";
@@ -24,7 +26,7 @@ import { Progress } from "@/app/components/Progress";
 import BookCover from "@/app/components/BookCover";
 
 const BookPage = ({ params }: { params: { id: string } }) => {
-  const { id } = params;
+  const { id } = React.use(params);
   const { token } = useAuth();
 
   const { data: bookData, error: bookError } = useSWR(
@@ -46,6 +48,62 @@ const BookPage = ({ params }: { params: { id: string } }) => {
     ratingValue: 0,
     review: "",
   });
+
+  const [reserving, setReserving] = useState<number | null>(null);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success", // Can be 'success' or 'error'
+  });
+
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const handleReserve = async (libraryId: number) => {
+    setReserving(libraryId);
+    try {
+      await fetch(`${config.API_URL}/operations/books/${id}/reserve`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ libraryId }),
+      });
+      setSnackbar({
+        open: true,
+        message: "Книга успешно забронирована",
+        severity: "success",
+      });
+    } catch (error) {
+      console.error("Ошибка при бронировании:", error);
+      setSnackbar({
+        open: true,
+        message: "Не удалось забронировать книгу",
+        severity: "error",
+      });
+    } finally {
+      setReserving(null);
+    }
+  };
+
+  const groupedCopies = bookData?.copies?.reduce((acc, copy) => {
+    if (!acc[copy.libraryId]) {
+      acc[copy.libraryId] = {
+        libraryId: copy.libraryId,
+        count: 0,
+        available: 0,
+      };
+    }
+    acc[copy.libraryId].count += 1;
+    if (copy.available) {
+      acc[copy.libraryId].available += 1;
+    }
+    return acc;
+  }, {});
+
+  const groupedData = Object.values(groupedCopies || {});
 
   const handleReviewChange = (field, value) => {
     setNewReview((prev) => ({ ...prev, [field]: value }));
@@ -134,20 +192,35 @@ const BookPage = ({ params }: { params: { id: string } }) => {
           <TableHead>
             <TableRow>
               <TableCell>Библиотека</TableCell>
-              <TableCell>Количество экземпляров</TableCell>
+              <TableCell>Всего экземпляров</TableCell>
+              <TableCell>Доступно</TableCell>
+              <TableCell>Действия</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {bookData.copies.length > 0 ? (
-              bookData.copies.map((copy) => (
-                <TableRow key={copy.id}>
-                  <TableCell>{getLibraryName(copy.libraryId)}</TableCell>
-                  <TableCell>1</TableCell>
+            {groupedData.length > 0 ? (
+              groupedData.map((group) => (
+                <TableRow key={group.libraryId}>
+                  <TableCell>{getLibraryName(group.libraryId)}</TableCell>
+                  <TableCell>{group.count}</TableCell>
+                  <TableCell>{group.available}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleReserve(group.libraryId)}
+                      disabled={reserving === group.libraryId}
+                    >
+                      {reserving === group.libraryId
+                        ? "Бронирование..."
+                        : "Забронировать"}
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={2} align="center">
+                <TableCell colSpan={4} align="center">
                   Нет экземпляров
                 </TableCell>
               </TableRow>
@@ -211,6 +284,20 @@ const BookPage = ({ params }: { params: { id: string } }) => {
           </CardContent>
         </Card>
       ))}
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
