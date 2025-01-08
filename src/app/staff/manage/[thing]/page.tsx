@@ -14,6 +14,7 @@ import { Themes } from "./Themes";
 import { Publishers } from "./Publishers";
 import Copies from "./Copies";
 import Bookings from "./Bookings";
+import Return from "./Return";
 
 const ALLOWED_PARAMS = [
   "authors",
@@ -22,6 +23,7 @@ const ALLOWED_PARAMS = [
   "publishers",
   "copies",
   "bookings",
+  "return",
 ];
 
 const ManagePage = ({ params }: { params: any }) => {
@@ -47,6 +49,7 @@ const ManagePage = ({ params }: { params: any }) => {
       {thing === "publishers" && <Publishers />}
       {thing === "copies" && <Copies />}
       {thing === "bookings" && <Bookings />}
+      {thing === "return" && <Return />}
     </div>
   );
 };
