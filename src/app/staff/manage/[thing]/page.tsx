@@ -13,8 +13,16 @@ import { Genres } from "./Genres";
 import { Themes } from "./Themes";
 import { Publishers } from "./Publishers";
 import Copies from "./Copies";
+import Bookings from "./Bookings";
 
-const ALLOWED_PARAMS = ["authors", "genres", "themes", "publishers", "copies"];
+const ALLOWED_PARAMS = [
+  "authors",
+  "genres",
+  "themes",
+  "publishers",
+  "copies",
+  "bookings",
+];
 
 const ManagePage = ({ params }: { params: any }) => {
   const { thing } = React.use(params);
@@ -38,6 +46,7 @@ const ManagePage = ({ params }: { params: any }) => {
       {thing === "themes" && <Themes />}
       {thing === "publishers" && <Publishers />}
       {thing === "copies" && <Copies />}
+      {thing === "bookings" && <Bookings />}
     </div>
   );
 };
