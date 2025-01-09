@@ -45,6 +45,9 @@ const StaffPage = () => {
         </div>
         <div className="admin">
           <Typography className="h6">Действия администратора</Typography>
+          <Button variant="outlined" href={`/staff/manage/libraries`}>
+            Управление библиотеками
+          </Button>
         </div>
       </div>
     </>

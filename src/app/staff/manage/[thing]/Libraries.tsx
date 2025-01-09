@@ -18,6 +18,9 @@ import {
   TextField,
   Box,
 } from "@mui/material";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { fetcher } from "@/app/utils/fetcher";
 import { config } from "@/app/utils/config";
 import { useAuth } from "@/app/components/AuthProvider";
@@ -32,8 +35,8 @@ const LibraryManagementPage = () => {
   const [newLibrary, setNewLibrary] = useState({
     name: "",
     address: "",
-    openingTime: "",
-    closingTime: "",
+    openingTime: null,
+    closingTime: null,
   });
 
   const [snackbar, setSnackbar] = useState({
@@ -69,7 +72,17 @@ const LibraryManagementPage = () => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newLibrary),
+        body: JSON.stringify({
+          ...newLibrary,
+          openingTime: `${String(openingTime.getHours()).padStart(
+            2,
+            "0"
+          )}:${openingTime.getMinutes()}`,
+          closingTime: `${String(closingTime.getHours()).padStart(
+            2,
+            "0"
+          )}:${closingTime.getMinutes()}`,
+        }),
       });
 
       if (response.ok) {
@@ -81,8 +94,8 @@ const LibraryManagementPage = () => {
         setNewLibrary({
           name: "",
           address: "",
-          openingTime: "",
-          closingTime: "",
+          openingTime: null,
+          closingTime: null,
         });
         mutate([`${config.API_URL}/library/allLibraries`, token]);
       } else {
@@ -97,7 +110,7 @@ const LibraryManagementPage = () => {
       console.error("Ошибка при добавлении библиотеки:", error);
       setSnackbar({
         open: true,
-        message: "Сетевая ошибка. Попробуйте позже",
+        message: "Ошибка. Попробуйте позже",
         severity: "error",
       });
     }
@@ -133,20 +146,44 @@ const LibraryManagementPage = () => {
             fullWidth
             margin="normal"
           />
-          <TextField
-            label="Время открытия (HH:MM)"
-            value={newLibrary.openingTime}
-            onChange={(e) => handleInputChange("openingTime", e.target.value)}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Время закрытия (HH:MM)"
-            value={newLibrary.closingTime}
-            onChange={(e) => handleInputChange("closingTime", e.target.value)}
-            fullWidth
-            margin="normal"
-          />
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: 12,
+              }}
+            >
+              <TimePicker
+                label="Время открытия"
+                value={newLibrary.openingTime}
+                onChange={(newValue) =>
+                  handleInputChange("openingTime", newValue)
+                }
+                ampm={false} // Disable AM/PM
+                sx={{
+                  flex: 1,
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} fullWidth margin="normal" />
+                )}
+              />
+              <TimePicker
+                label="Время закрытия"
+                value={newLibrary.closingTime}
+                sx={{
+                  flex: 1,
+                }}
+                onChange={(newValue) =>
+                  handleInputChange("closingTime", newValue)
+                }
+                ampm={false} // Disable AM/PM
+                renderInput={(params) => (
+                  <TextField {...params} fullWidth margin="normal" />
+                )}
+              />
+            </div>
+          </LocalizationProvider>
           <Button
             variant="contained"
             color="primary"
@@ -159,6 +196,7 @@ const LibraryManagementPage = () => {
         </CardContent>
       </Card>
 
+      {/* Libraries Table */}
       <TableContainer component={Card} style={{ marginBottom: "20px" }}>
         <Table>
           <TableHead>
