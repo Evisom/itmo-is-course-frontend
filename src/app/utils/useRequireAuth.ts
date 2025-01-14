@@ -10,21 +10,31 @@ type UseRequireAuthOptions = {
 };
 
 export const useRequireAuth = ({
-  requiredRole,
+  requiredRole = "ROLE_USER",
   redirectUrl = "/login",
 }: UseRequireAuthOptions = {}) => {
-  const { authenticated, loading } = useAuth();
+  const { authenticated, loading, roles } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (!loading) {
       if (!authenticated) {
         router.push(redirectUrl);
-      } else {
-        // на будущее - проверка ролей
+      } else if (!hasAccess(requiredRole, roles)) {
+        router.push(redirectUrl);
       }
     }
-  }, [authenticated, loading, requiredRole, redirectUrl, router]);
+  }, [authenticated, loading, roles, requiredRole, redirectUrl, router]);
+
+  const hasAccess = (requiredRole: string, userRoles: string[]): boolean => {
+    if (requiredRole === "ROLE_USER") return true; // ROLE_USER доступна всем
+    if (requiredRole === "ROLE_LIBRARIAN")
+      return (
+        userRoles.includes("ROLE_LIBRARIAN") || userRoles.includes("ROLE_ADMIN")
+      );
+    if (requiredRole === "ROLE_ADMIN") return userRoles.includes("ROLE_ADMIN");
+    return false;
+  };
 
   return { authenticated, loading };
 };

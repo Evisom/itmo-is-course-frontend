@@ -14,6 +14,7 @@ import {
   Alert,
   Switch,
   FormControlLabel,
+  CircularProgress,
 } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { fetcher } from "@/app/utils/fetcher";
@@ -25,13 +26,11 @@ const Copies = () => {
   const { token } = useAuth();
   const { error, showError } = useErrorAlert();
 
-  // Fetch copies data
-  const { data: copiesData, mutate: mutateCopies } = useSWR(
-    [`${config.API_URL}/library/copies`, token],
-    ([url, token]) => fetcher(url, token)
-  );
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
+  });
 
-  // Shared state for form
   const [formState, setFormState] = useState({
     id: null,
     bookId: "",
@@ -40,10 +39,17 @@ const Copies = () => {
     available: false,
   });
 
-  // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Handle form changes
+  const { data, isLoading, mutate } = useSWR(
+    [
+      `${config.API_URL}/library/copies?page=${paginationModel.page}&size=${paginationModel.pageSize}`,
+      token,
+    ],
+    ([url, token]) => fetcher(url, token),
+    { revalidateOnFocus: false }
+  );
+
   const handleInputChange = (field) => (event) => {
     setFormState((prevState) => ({
       ...prevState,
@@ -52,7 +58,6 @@ const Copies = () => {
     }));
   };
 
-  // Open modal for editing
   const handleEdit = (row) => {
     setFormState({
       id: row.id,
@@ -64,7 +69,6 @@ const Copies = () => {
     setIsModalOpen(true);
   };
 
-  // Close modal
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setFormState({
@@ -76,7 +80,6 @@ const Copies = () => {
     });
   };
 
-  // Handle form submission
   const handleSubmit = async () => {
     try {
       const url =
@@ -105,14 +108,13 @@ const Copies = () => {
         throw new Error("Ошибка при сохранении экземпляра");
       }
 
-      mutateCopies();
+      mutate();
       handleCloseModal();
     } catch (err) {
       showError(err.message);
     }
   };
 
-  // Handle delete
   const handleDelete = async (id) => {
     try {
       const response = await fetch(`${config.API_URL}/library/copies/${id}`, {
@@ -126,13 +128,12 @@ const Copies = () => {
         throw new Error("Ошибка при удалении экземпляра");
       }
 
-      mutateCopies();
+      mutate();
     } catch (err) {
       showError(err.message);
     }
   };
 
-  // Define columns
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", flex: 1 },
     { field: "bookId", headerName: "ID Книги", flex: 2 },
@@ -190,12 +191,26 @@ const Copies = () => {
         Добавить экземпляр
       </Button>
       <DataGrid
-        rows={copiesData || []}
+        key={"24324"}
+        rows={data?.content || []}
         columns={columns}
         autoHeight
-        hideFooter
-        hideFooterPagination
+        pagination
+        paginationMode="server"
+        rowCount={data?.totalElements}
+        paginationModel={paginationModel}
+        onPaginationModelChange={(model) => {
+          // Сохраняем текущую страницу и размер в состоянии
+          setPaginationModel((prev) => ({
+            ...prev,
+            page: model.page !== undefined ? model.page : prev.page,
+            pageSize:
+              model.pageSize !== undefined ? model.pageSize : prev.pageSize,
+          }));
+        }}
+        loading={!data && !error}
       />
+
       <Dialog open={isModalOpen} onClose={handleCloseModal}>
         <DialogTitle>
           {formState.id === null

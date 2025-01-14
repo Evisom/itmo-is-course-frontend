@@ -16,6 +16,7 @@ import Copies from "./Copies";
 import Bookings from "./Bookings";
 import Return from "./Return";
 import LibraryManagementPage from "./Libraries";
+import CsvImportPage from "../Import";
 
 const ALLOWED_PARAMS = [
   "authors",
@@ -26,12 +27,13 @@ const ALLOWED_PARAMS = [
   "bookings",
   "return",
   "libraries",
+  "import",
 ];
 
 const ManagePage = ({ params }: { params: any }) => {
   const { thing } = React.use(params);
   const router = useRouter();
-  const { loading } = useRequireAuth();
+  const { loading } = useRequireAuth({ requiredRole: "ROLE_LIBRARIAN" });
 
   if (!ALLOWED_PARAMS.includes(thing)) {
     router.back();
@@ -53,6 +55,7 @@ const ManagePage = ({ params }: { params: any }) => {
       {thing === "bookings" && <Bookings />}
       {thing === "return" && <Return />}
       {thing === "libraries" && <LibraryManagementPage />}
+      {thing === "import" && <CsvImportPage />}
     </div>
   );
 };

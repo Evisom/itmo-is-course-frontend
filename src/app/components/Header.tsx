@@ -80,6 +80,8 @@ export const Header = () => {
               aria-controls="menu-appbar"
               aria-haspopup="true"
               color="inherit"
+              href="https://keycloak.itmo.dmitriy.space/realms/boobook/account/"
+              target="_blank"
             >
               <AccountCircle />
             </IconButton>

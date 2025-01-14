@@ -98,7 +98,7 @@ const ApprovalsPage = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ reason_text: declineReason }),
+          body: JSON.stringify({ comment: declineReason }),
         }
       );
       setSnackbar({

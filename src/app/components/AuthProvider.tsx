@@ -16,6 +16,8 @@ interface AuthContextProps {
   loading: boolean;
   token: string | null;
   username: string | null;
+  userId: string | null;
+  roles: string[];
   login: () => void;
   logout: () => void;
 }
@@ -26,6 +28,8 @@ const AuthContext = createContext<AuthContextProps>({
   loading: true,
   token: null,
   username: null,
+  userId: null,
+  roles: [],
   login: () => {},
   logout: () => {},
 });
@@ -36,6 +40,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [token, setToken] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [roles, setRoles] = useState<string[]>([]);
 
   useEffect(() => {
     const kc = new Keycloak({
@@ -55,7 +61,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (auth) {
           updateAuthState(kc, true);
         } else {
-          // Если silent login не удался, не редиректим, просто устанавливаем состояние
           setAuthenticated(false);
           setLoading(false);
         }
@@ -70,6 +75,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setAuthenticated(auth);
     setToken(kc.token || null);
     setUsername(kc.tokenParsed?.preferred_username || null);
+    setUserId(kc.tokenParsed?.sub || null);
+    setRoles(kc.tokenParsed?.realm_access?.roles || []);
 
     setLoading(false);
 
@@ -80,6 +87,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           if (refreshed) {
             setToken(kc.token || null);
             setUsername(kc.tokenParsed?.preferred_username || null);
+            setUserId(kc.tokenParsed?.sub || null);
+            setRoles(kc.tokenParsed?.realm_access?.roles || []);
           }
         });
       }, 30000);
@@ -87,6 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = () => {
+    console.log("login", keycloak);
     keycloak?.login({ redirectUri: window.location.origin });
   };
 
@@ -96,6 +106,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Очистка состояния
     setToken(null);
     setUsername(null);
+    setUserId(null);
+    setRoles([]);
     setAuthenticated(false);
   };
 
@@ -107,6 +119,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         loading,
         token,
         username,
+        userId,
+        roles,
         login,
         logout,
       }}

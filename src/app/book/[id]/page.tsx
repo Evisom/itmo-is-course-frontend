@@ -27,7 +27,7 @@ import BookCover from "@/app/components/BookCover";
 
 const BookPage = ({ params }: { params: { id: string } }) => {
   const { id } = React.use(params);
-  const { token } = useAuth();
+  const { token, roles } = useAuth();
 
   const { data: bookData, error: bookError } = useSWR(
     [`${config.API_URL}/library/books/${id}`, token],
@@ -41,6 +41,11 @@ const BookPage = ({ params }: { params: { id: string } }) => {
 
   const { data: librariesData, error: librariesError } = useSWR(
     [`${config.API_URL}/library/allLibraries`, token],
+    ([url, token]) => fetcher(url, token)
+  );
+
+  const { data: readingStatus } = useSWR(
+    [`${config.API_URL}/operations/readingStatus?bookId=${id}`, token],
     ([url, token]) => fetcher(url, token)
   );
 
@@ -177,13 +182,17 @@ const BookPage = ({ params }: { params: { id: string } }) => {
           <Typography>
             <strong>ISBN:</strong> {bookData.isbn}
           </Typography>
-          <Button
-            sx={{ marginTop: "12px" }}
-            variant="outlined"
-            href={"/staff/manage/book/" + bookData.id}
-          >
-            редактировать
-          </Button>
+          {bookData.rating !== 0 && <Rating value={bookData.rating} />}
+          {(roles.includes("ROLE_ADMIN") ||
+            roles.includes("ROLE_LIBRARIAN")) && (
+            <Button
+              sx={{ marginTop: "12px" }}
+              variant="outlined"
+              href={"/staff/manage/book/" + bookData.id}
+            >
+              редактировать
+            </Button>
+          )}
         </CardContent>
       </Card>
 
@@ -274,6 +283,7 @@ const BookPage = ({ params }: { params: { id: string } }) => {
       </Card>
 
       {/* Reviews */}
+      {readingStatus.includes("RETURNED")}
       <Typography variant="h5" style={{ marginTop: "20px" }}>
         Отзывы
       </Typography>

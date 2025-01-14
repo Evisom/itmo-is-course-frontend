@@ -3,9 +3,12 @@ import { Button, Typography } from "@mui/material";
 import { Progress } from "../components/Progress";
 import { useRequireAuth } from "../utils/useRequireAuth";
 import "./page.scss";
+import { useAuth } from "../components/AuthProvider";
 const StaffPage = () => {
-  const { authenticated, loading } = useRequireAuth();
-
+  const { authenticated, loading } = useRequireAuth({
+    requiredRole: "ROLE_LIBRARIAN",
+  });
+  const { roles } = useAuth();
   if (loading || !authenticated) {
     return <Progress />;
   }
@@ -22,7 +25,8 @@ const StaffPage = () => {
     <>
       <Typography variant="h4">Управление библиотекой</Typography>
       <Typography variant="subtitle1">
-        Вам доступен функционал {true && "администратора"}
+        Вам доступен функционал{" "}
+        {roles.includes("ROLE_ADMIN") ? "администратора" : "библиотекаря"}
       </Typography>
       <div className="actions">
         <div className="librarian">
@@ -43,12 +47,14 @@ const StaffPage = () => {
             Возврат
           </Button>
         </div>
-        <div className="admin">
-          <Typography className="h6">Действия администратора</Typography>
-          <Button variant="outlined" href={`/staff/manage/libraries`}>
-            Управление библиотеками
-          </Button>
-        </div>
+        {roles.includes("ROLE_ADMIN") && (
+          <div className="admin">
+            <Typography className="h6">Действия администратора</Typography>
+            <Button variant="outlined" href={`/staff/manage/libraries`}>
+              Управление библиотеками
+            </Button>
+          </div>
+        )}
       </div>
     </>
   );

@@ -24,9 +24,11 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { fetcher } from "@/app/utils/fetcher";
 import { config } from "@/app/utils/config";
 import { useAuth } from "@/app/components/AuthProvider";
+import { useRequireAuth } from "@/app/utils/useRequireAuth";
 
 const LibraryManagementPage = () => {
   const { token } = useAuth();
+  const { loading } = useRequireAuth({ requiredRole: "ROLE_ADMIN" });
   const { data: librariesData, error: librariesError } = useSWR(
     [`${config.API_URL}/library/allLibraries`, token],
     ([url, token]) => fetcher(url, token)
