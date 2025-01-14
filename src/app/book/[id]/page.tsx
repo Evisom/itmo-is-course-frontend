@@ -189,7 +189,7 @@ const BookPage = ({ params }: { params: { id: string } }) => {
           {(roles.includes("ROLE_ADMIN") ||
             roles.includes("ROLE_LIBRARIAN")) && (
             <Button
-              sx={{ marginTop: "12px" }}
+              sx={{ marginTop: "12px", display: "block", width: "fit-content" }}
               variant="outlined"
               href={"/staff/manage/book/" + bookData.id}
             >
@@ -249,41 +249,47 @@ const BookPage = ({ params }: { params: { id: string } }) => {
       </TableContainer>
 
       {/* Add Review */}
-      <Typography
-        variant="h5"
-        style={{ marginBottom: "16px", marginTop: "16px" }}
-      >
-        Добавить отзыв
-      </Typography>
-      <Card>
-        <CardContent>
-          <Box>
-            <Typography>Рейтинг</Typography>
-            <Rating
-              value={newReview.ratingValue}
-              onChange={(e, value) => handleReviewChange("ratingValue", value)}
-            />
-          </Box>
-          <TextField
-            label="Отзыв"
-            multiline
-            rows={4}
-            fullWidth
-            value={newReview.review}
-            onChange={(e) => handleReviewChange("review", e.target.value)}
-            style={{ marginTop: "10px" }}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            style={{ marginTop: "10px" }}
-            onClick={handleReviewSubmit}
-            disabled={!newReview.ratingValue || !newReview.review.trim()}
+      {readingStatus?.includes("RETURNED") && (
+        <>
+          <Typography
+            variant="h5"
+            style={{ marginBottom: "16px", marginTop: "16px" }}
           >
-            Отправить
-          </Button>
-        </CardContent>
-      </Card>
+            Добавить отзыв
+          </Typography>
+          <Card>
+            <CardContent>
+              <Box>
+                <Typography>Рейтинг</Typography>
+                <Rating
+                  value={newReview.ratingValue}
+                  onChange={(e, value) =>
+                    handleReviewChange("ratingValue", value)
+                  }
+                />
+              </Box>
+              <TextField
+                label="Отзыв"
+                multiline
+                rows={4}
+                fullWidth
+                value={newReview.review}
+                onChange={(e) => handleReviewChange("review", e.target.value)}
+                style={{ marginTop: "10px" }}
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                style={{ marginTop: "10px" }}
+                onClick={handleReviewSubmit}
+                disabled={!newReview.ratingValue || !newReview.review.trim()}
+              >
+                Отправить
+              </Button>
+            </CardContent>
+          </Card>
+        </>
+      )}
 
       {/* Reviews */}
       {readingStatus?.includes("RETURNED")}

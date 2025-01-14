@@ -40,7 +40,7 @@ export default function Home() {
     publishers: [],
     authors: [],
     minCopies: 0,
-    maxCopies: 1000,
+    maxCopies: 100,
     rating: [1, 5],
     popularity: "asc",
     available: true,
@@ -236,9 +236,9 @@ export default function Home() {
                     handleFilterChange("maxCopies", value[1]);
                   }}
                   valueLabelDisplay="auto"
-                  step={50}
+                  step={5}
                   min={0}
-                  max={1000}
+                  max={100}
                 />
               </Box>
               <Typography gutterBottom>Рейтинг</Typography>
@@ -299,7 +299,7 @@ export default function Home() {
                     <Grid container spacing={2}>
                       {booksData?.content?.map((book) => (
                         <Grid item xs={12} sm={6} md={4} key={book.id}>
-                          <Card>
+                          <Card sx={{ height: "404px" }}>
                             <Link
                               href={`/book/${book.id}`}
                               sx={{ textDecoration: "none" }}
@@ -318,7 +318,7 @@ export default function Home() {
                                 variant="body2"
                                 color="text.secondary"
                               >
-                                Автор(ы):{" "}
+                                Автор:{" "}
                                 {book.authors.length > 0
                                   ? book.authors
                                       .map(

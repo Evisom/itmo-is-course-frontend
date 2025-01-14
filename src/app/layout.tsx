@@ -9,6 +9,7 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { Container, CssBaseline } from "@mui/material";
 import { Header } from "./components/Header";
+import { Suspense } from "react";
 
 export default function RootLayout({
   children,
@@ -22,13 +23,15 @@ export default function RootLayout({
           <ThemeProvider theme={theme}>
             <CssBaseline />
             <AuthProvider>
-              <Header />
-              <Container
-                style={{ height: "100%", paddingTop: "92px" }}
-                maxWidth="xl"
-              >
-                {children}
-              </Container>
+              <Suspense>
+                <Header />
+                <Container
+                  style={{ height: "100%", paddingTop: "92px" }}
+                  maxWidth="xl"
+                >
+                  {children}
+                </Container>
+              </Suspense>
             </AuthProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>

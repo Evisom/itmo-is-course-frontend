@@ -19,18 +19,18 @@ import { useAuth } from "../components/AuthProvider";
 import { fetcher } from "../utils/fetcher";
 import { config } from "../utils/config";
 import { Progress } from "../components/Progress";
-// import { useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
-const UserHistoryPage = ({ userEmail }) => {
-  // const searchParams = useSearchParams();
+const UserHistoryPage = () => {
+  const searchParams = useSearchParams();
 
-  // const userEmail = searchParams.get("email");
+  const userEmail = searchParams.get("email");
   const { email, token } = useAuth();
   const { data: historyData, mutate } = useSWR(
     email
       ? [
           `${config.API_URL}/operations/history?email=${
-            userEmail ? userEmail : email
+            token ? (userEmail ? userEmail : email) : null
           }`,
           token,
         ]

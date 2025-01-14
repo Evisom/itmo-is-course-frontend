@@ -21,6 +21,7 @@ const StaffPage = () => {
     "copies",
     "bookings",
     "reports",
+    "import",
   ];
 
   return (

@@ -15,7 +15,7 @@ import { useAuth } from "./AuthProvider";
 import { useRouter } from "next/navigation";
 
 export const Header = () => {
-  const { username, authenticated, logout, loading } = useAuth();
+  const { username, authenticated, logout, loading, roles } = useAuth();
   const router = useRouter();
   if (!authenticated || loading) return;
 
@@ -67,12 +67,15 @@ export const Header = () => {
             >
               история
             </Button>
-            <Button
-              sx={{ my: 2, color: "white", display: "block" }}
-              onClick={() => router.push("/staff")}
-            >
-              управление библиотекой
-            </Button>
+            {(roles.includes("ROLE_ADMIN") ||
+              roles.includes("ROLE_LIBRARIAN")) && (
+              <Button
+                sx={{ my: 2, color: "white", display: "block" }}
+                onClick={() => router.push("/staff")}
+              >
+                управление библиотекой
+              </Button>
+            )}
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center" }}>

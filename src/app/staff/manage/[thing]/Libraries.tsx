@@ -79,11 +79,11 @@ const LibraryManagementPage = () => {
           openingTime: `${String(openingTime.getHours()).padStart(
             2,
             "0"
-          )}:${openingTime.getMinutes()}`,
+          )}:${String(openingTime.getMinutes()).padEnd(2, "0")}`,
           closingTime: `${String(closingTime.getHours()).padStart(
             2,
             "0"
-          )}:${closingTime.getMinutes()}`,
+          )}:${String(closingTime.getMinutes()).padEnd(2, "0")}`,
         }),
       });
 
@@ -112,7 +112,7 @@ const LibraryManagementPage = () => {
       console.error("Ошибка при добавлении библиотеки:", error);
       setSnackbar({
         open: true,
-        message: "Ошибка. Попробуйте позже",
+        message: "Ошибка. Попробуйте позже " + error,
         severity: "error",
       });
     }
