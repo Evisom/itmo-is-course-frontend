@@ -30,7 +30,7 @@ const LibraryManagementPage = () => {
   const { token } = useAuth();
   const { loading } = useRequireAuth({ requiredRole: "ROLE_ADMIN" });
   const { data: librariesData, error: librariesError } = useSWR(
-    [`${config.API_URL}/library/allLibraries`, token],
+    token ? [`${config.API_URL}/library/allLibraries`, token] : null,
     ([url, token]) => fetcher(url, token)
   );
 

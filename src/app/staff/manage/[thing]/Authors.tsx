@@ -27,7 +27,7 @@ export const Authors = () => {
   });
 
   const { data, mutate } = useSWR(
-    [`${config.API_URL}/library/authors`, token],
+    [token ? `${config.API_URL}/library/authors` : null, token],
     ([url, token]) => fetcher(url, token)
   );
 

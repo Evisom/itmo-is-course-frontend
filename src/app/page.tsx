@@ -52,19 +52,19 @@ export default function Home() {
   });
 
   const { data: publishersData } = useSWR(
-    [`${config.API_URL}/library/publishers`, token],
+    [token ? `${config.API_URL}/library/publishers` : null, token],
     ([url, token]) => fetcher(url, token)
   );
   const { data: themesData } = useSWR(
-    [`${config.API_URL}/library/themes`, token],
+    [token ? `${config.API_URL}/library/themes` : null, token],
     ([url, token]) => fetcher(url, token)
   );
   const { data: authorsData } = useSWR(
-    [`${config.API_URL}/library/authors`, token],
+    [token ? `${config.API_URL}/library/authors` : null, token],
     ([url, token]) => fetcher(url, token)
   );
   const { data: genresData } = useSWR(
-    [`${config.API_URL}/library/genres`, token],
+    [token ? `${config.API_URL}/library/genres` : null, token],
     ([url, token]) => fetcher(url, token)
   );
 
@@ -106,7 +106,10 @@ export default function Home() {
   };
 
   const { data: booksData, isValidating } = useSWR(
-    [`${config.API_URL}/library/find?${createQueryString()}`, token],
+    [
+      token ? `${config.API_URL}/library/find?${createQueryString()}` : null,
+      token,
+    ],
     ([url, token]) => fetcher(url, token),
     { revalidateOnFocus: false }
   );
@@ -249,7 +252,7 @@ export default function Home() {
                   max={5}
                 />
               </Box>
-              <FormControlLabel
+              {/* <FormControlLabel
                 control={
                   <Checkbox
                     checked={filterState.available}
@@ -259,7 +262,7 @@ export default function Home() {
                   />
                 }
                 label="Доступно"
-              />
+              /> */}
             </CardContent>
           </Card>
         </div>
@@ -291,7 +294,7 @@ export default function Home() {
               <Progress />
             ) : (
               <>
-                {booksData.content?.length ? (
+                {booksData?.content?.length ? (
                   <>
                     <Grid container spacing={2}>
                       {booksData?.content?.map((book) => (

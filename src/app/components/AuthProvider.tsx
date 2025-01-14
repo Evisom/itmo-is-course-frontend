@@ -17,6 +17,7 @@ interface AuthContextProps {
   token: string | null;
   username: string | null;
   userId: string | null;
+  email: string | null;
   roles: string[];
   login: () => void;
   logout: () => void;
@@ -29,6 +30,7 @@ const AuthContext = createContext<AuthContextProps>({
   token: null,
   username: null,
   userId: null,
+  email: null,
   roles: [],
   login: () => {},
   logout: () => {},
@@ -41,6 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
   const [roles, setRoles] = useState<string[]>([]);
 
   useEffect(() => {
@@ -76,6 +79,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setToken(kc.token || null);
     setUsername(kc.tokenParsed?.preferred_username || null);
     setUserId(kc.tokenParsed?.sub || null);
+    setEmail(kc.tokenParsed?.email || null);
     setRoles(kc.tokenParsed?.realm_access?.roles || []);
 
     setLoading(false);
@@ -88,6 +92,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setToken(kc.token || null);
             setUsername(kc.tokenParsed?.preferred_username || null);
             setUserId(kc.tokenParsed?.sub || null);
+            setEmail(kc.tokenParsed?.email || null);
             setRoles(kc.tokenParsed?.realm_access?.roles || []);
           }
         });
@@ -96,7 +101,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = () => {
-    console.log("login", keycloak);
     keycloak?.login({ redirectUri: window.location.origin });
   };
 
@@ -107,6 +111,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setToken(null);
     setUsername(null);
     setUserId(null);
+    setEmail(null);
     setRoles([]);
     setAuthenticated(false);
   };
@@ -120,6 +125,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         token,
         username,
         userId,
+        email,
         roles,
         login,
         logout,

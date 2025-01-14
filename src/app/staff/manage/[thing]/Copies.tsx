@@ -43,7 +43,9 @@ const Copies = () => {
 
   const { data, isLoading, mutate } = useSWR(
     [
-      `${config.API_URL}/library/copies?page=${paginationModel.page}&size=${paginationModel.pageSize}`,
+      token
+        ? `${config.API_URL}/library/copies?page=${paginationModel.page}&size=${paginationModel.pageSize}`
+        : null,
       token,
     ],
     ([url, token]) => fetcher(url, token),

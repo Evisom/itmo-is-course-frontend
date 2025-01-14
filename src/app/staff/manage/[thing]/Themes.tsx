@@ -24,7 +24,7 @@ export const Themes = () => {
   });
 
   const { data, mutate } = useSWR(
-    [`${config.API_URL}/library/themes`, token],
+    token ? [`${config.API_URL}/library/themes`, token] : null,
     ([url, token]) => fetcher(url, token)
   );
 

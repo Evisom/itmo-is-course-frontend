@@ -43,7 +43,7 @@ const ApprovalsPage = () => {
   });
 
   const { data: librariesData, error: librariesError } = useSWR(
-    [`${config.API_URL}/library/allLibraries`, token],
+    [token ? `${config.API_URL}/library/allLibraries` : null, token],
     ([url, token]) => fetcher(url, token)
   );
 

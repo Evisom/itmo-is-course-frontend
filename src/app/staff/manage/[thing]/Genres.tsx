@@ -24,7 +24,7 @@ export const Genres = () => {
   });
 
   const { data, mutate } = useSWR(
-    [`${config.API_URL}/library/genres`, token],
+    token ? [`${config.API_URL}/library/genres`, token] : null,
     ([url, token]) => fetcher(url, token)
   );
 

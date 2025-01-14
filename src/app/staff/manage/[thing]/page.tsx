@@ -17,6 +17,8 @@ import Bookings from "./Bookings";
 import Return from "./Return";
 import LibraryManagementPage from "./Libraries";
 import CsvImportPage from "../Import";
+import Reports from "./Reports";
+import LibraryReportPage from "./LibraryReport";
 
 const ALLOWED_PARAMS = [
   "authors",
@@ -28,6 +30,8 @@ const ALLOWED_PARAMS = [
   "return",
   "libraries",
   "import",
+  "reports",
+  "libraryReport",
 ];
 
 const ManagePage = ({ params }: { params: any }) => {
@@ -46,7 +50,7 @@ const ManagePage = ({ params }: { params: any }) => {
 
   return (
     <div>
-      <Typography variant="h4">{`Управление ${thing}`}</Typography>
+      <Typography variant="h4">{`${thing}`}</Typography>
       {thing === "authors" && <Authors />}
       {thing === "genres" && <Genres />}
       {thing === "themes" && <Themes />}
@@ -56,6 +60,8 @@ const ManagePage = ({ params }: { params: any }) => {
       {thing === "return" && <Return />}
       {thing === "libraries" && <LibraryManagementPage />}
       {thing === "import" && <CsvImportPage />}
+      {thing === "reports" && <Reports />}
+      {thing === "libraryReport" && <LibraryReportPage />}
     </div>
   );
 };

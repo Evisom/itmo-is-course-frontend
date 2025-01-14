@@ -61,8 +61,11 @@ export const Header = () => {
           </Box>
 
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            <Button sx={{ my: 2, color: "white", display: "block" }}>
-              история бронирований
+            <Button
+              sx={{ my: 2, color: "white", display: "block" }}
+              onClick={() => router.push("/history")}
+            >
+              история
             </Button>
             <Button
               sx={{ my: 2, color: "white", display: "block" }}

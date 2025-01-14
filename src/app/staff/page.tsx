@@ -19,6 +19,8 @@ const StaffPage = () => {
     "themes",
     "publishers",
     "copies",
+    "bookings",
+    "reports",
   ];
 
   return (

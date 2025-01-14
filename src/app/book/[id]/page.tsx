@@ -30,22 +30,25 @@ const BookPage = ({ params }: { params: { id: string } }) => {
   const { token, roles } = useAuth();
 
   const { data: bookData, error: bookError } = useSWR(
-    [`${config.API_URL}/library/books/${id}`, token],
+    [token ? `${config.API_URL}/library/books/${id}` : null, token],
     ([url, token]) => fetcher(url, token)
   );
 
   const { data: reviewsData, error: reviewsError } = useSWR(
-    [`${config.API_URL}/operations/reviews/${id}`, token],
+    [token ? `${config.API_URL}/operations/reviews/${id}` : null, token],
     ([url, token]) => fetcher(url, token)
   );
 
   const { data: librariesData, error: librariesError } = useSWR(
-    [`${config.API_URL}/library/allLibraries`, token],
+    [token ? `${config.API_URL}/library/allLibraries` : null, token],
     ([url, token]) => fetcher(url, token)
   );
 
   const { data: readingStatus } = useSWR(
-    [`${config.API_URL}/operations/readingStatus?bookId=${id}`, token],
+    [
+      token ? `${config.API_URL}/operations/readingStatus?bookId=${id}` : null,
+      token,
+    ],
     ([url, token]) => fetcher(url, token)
   );
 
@@ -283,7 +286,7 @@ const BookPage = ({ params }: { params: { id: string } }) => {
       </Card>
 
       {/* Reviews */}
-      {readingStatus.includes("RETURNED")}
+      {readingStatus?.includes("RETURNED")}
       <Typography variant="h5" style={{ marginTop: "20px" }}>
         Отзывы
       </Typography>

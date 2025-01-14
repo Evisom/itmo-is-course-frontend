@@ -24,7 +24,7 @@ export const Publishers = () => {
 
   const { error, showError } = useErrorAlert();
   const { data, mutate } = useSWR(
-    [`${config.API_URL}/library/publishers`, token],
+    token ? [`${config.API_URL}/library/publishers`, token] : null,
     ([url, token]) => fetcher(url, token)
   );
 

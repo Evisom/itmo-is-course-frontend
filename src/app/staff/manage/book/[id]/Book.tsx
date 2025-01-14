@@ -22,24 +22,26 @@ const Book = ({ type, id = -1 }) => {
   const { error, showError } = useErrorAlert();
 
   const { data: publishersData } = useSWR(
-    [`${config.API_URL}/library/publishers`, token],
+    token ? [`${config.API_URL}/library/publishers`, token] : null,
     ([url, token]) => fetcher(url, token)
   );
   const { data: themesData } = useSWR(
-    [`${config.API_URL}/library/themes`, token],
+    token ? [`${config.API_URL}/library/themes`, token] : null,
     ([url, token]) => fetcher(url, token)
   );
   const { data: authorsData } = useSWR(
-    [`${config.API_URL}/library/authors`, token],
+    token ? [`${config.API_URL}/library/authors`, token] : null,
     ([url, token]) => fetcher(url, token)
   );
   const { data: genresData } = useSWR(
-    [`${config.API_URL}/library/genres`, token],
+    token ? [`${config.API_URL}/library/genres`, token] : null,
     ([url, token]) => fetcher(url, token)
   );
 
   const { data: bookData } = useSWR(
-    type === "edit" ? [`${config.API_URL}/library/books/${id}`, token] : null,
+    type === "edit" && token
+      ? [`${config.API_URL}/library/books/${id}`, token]
+      : null,
     ([url, token]) => fetcher(url, token)
   );
 
