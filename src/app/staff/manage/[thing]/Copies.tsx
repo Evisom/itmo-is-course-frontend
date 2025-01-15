@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useSWR from "swr";
 import {
   Button,
-  TextField,
   Typography,
   Box,
   Dialog,
@@ -15,6 +14,9 @@ import {
   Switch,
   FormControlLabel,
   CircularProgress,
+  Autocomplete,
+  TextField,
+  MenuItem,
 } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { fetcher } from "@/app/utils/fetcher";
@@ -37,36 +39,86 @@ const Copies = () => {
     libraryId: "",
     inventoryNumber: "",
     available: false,
+    bookTitle: "",
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Fetch libraries for the dropdown
+  const { data: libraries } = useSWR(
+    token ? [`${config.API_URL}/library/allLibraries`, token] : null,
+    ([url, token]) => fetcher(url, token)
+  );
+
+  // Fetch copies data
   const { data, isLoading, mutate } = useSWR(
-    [
-      token
-        ? `${config.API_URL}/library/copies?page=${paginationModel.page}&size=${paginationModel.pageSize}`
-        : null,
-      token,
-    ],
+    token
+      ? [
+          `${config.API_URL}/library/copies?page=${paginationModel.page}&size=${paginationModel.pageSize}`,
+          token,
+        ]
+      : null,
     ([url, token]) => fetcher(url, token),
     { revalidateOnFocus: false }
   );
 
-  const handleInputChange = (field) => (event) => {
+  // Fetch books based on input
+  const [bookOptions, setBookOptions] = useState([]);
+  const handleBookSearch = async (query) => {
+    const params = new URLSearchParams();
+    params.append("name", query);
+    if (query.length > 0) {
+      const response = await fetch(
+        `${config.API_URL}/library/find?${params.toString()}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (response.ok) {
+        const books = await response.json();
+        setBookOptions(
+          books.content.map((book) => ({ id: book.id, label: book.title }))
+        );
+      }
+    }
+  };
+
+  // Fetch book title for editing
+  const fetchBookTitle = async (bookId) => {
+    try {
+      const response = await fetch(
+        `${config.API_URL}/library/books/${bookId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (response.ok) {
+        const book = await response.json();
+
+        return book.title;
+      }
+    } catch {
+      return "Неизвестная книга";
+    }
+  };
+
+  const handleInputChange = (field) => (event, value) => {
     setFormState((prevState) => ({
       ...prevState,
-      [field]:
-        field === "available" ? event.target.checked : event.target.value,
+      [field]: field === "available" ? event.target.checked : value,
     }));
   };
 
-  const handleEdit = (row) => {
+  const handleEdit = async (row) => {
+    const bookTitle = await fetchBookTitle(row.bookId);
+    setBookOptions((prev) => [...prev, { id: row.bookId, label: bookTitle }]);
     setFormState({
       id: row.id,
       bookId: row.bookId,
       libraryId: row.libraryId,
       inventoryNumber: row.inventoryNumber,
       available: row.available,
+      bookTitle,
     });
     setIsModalOpen(true);
   };
@@ -79,6 +131,7 @@ const Copies = () => {
       libraryId: "",
       inventoryNumber: "",
       available: false,
+      bookTitle: "",
     });
   };
 
@@ -177,13 +230,11 @@ const Copies = () => {
 
   return (
     <>
-      <div className="alert">
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-      </div>
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
 
       <Button
         variant="contained"
@@ -193,13 +244,13 @@ const Copies = () => {
         Добавить экземпляр
       </Button>
       <DataGrid
-        key={"24324"}
         rows={data?.content || []}
         columns={columns}
         autoHeight
         pagination
         paginationMode="server"
         rowCount={data?.totalElements}
+        key={"24324"}
         paginationModel={paginationModel}
         onPaginationModelChange={(model) => {
           // Сохраняем текущую страницу и размер в состоянии
@@ -213,31 +264,74 @@ const Copies = () => {
         loading={!data && !error}
       />
 
-      <Dialog open={isModalOpen} onClose={handleCloseModal}>
+      <Dialog open={isModalOpen} onClose={handleCloseModal} fullWidth>
         <DialogTitle>
           {formState.id === null
             ? "Добавление экземпляра"
             : "Редактирование экземпляра"}
         </DialogTitle>
         <DialogContent>
-          <TextField
-            label="ID Книги"
-            value={formState.bookId}
-            onChange={handleInputChange("bookId")}
+          {/* {JSON.stringify(formState)} */}
+          <Autocomplete
+            options={bookOptions}
+            value={
+              bookOptions.find((option) => option.id === formState.bookId) ||
+              null
+            }
+            onInputChange={(event, value) => {
+              handleBookSearch(value);
+              if (value === "") {
+                // Сброс значения, если поле очистили
+                setFormState((prev) => ({
+                  ...prev,
+                  bookId: "",
+                  bookTitle: "",
+                }));
+              }
+            }}
+            onChange={(event, value) => {
+              setFormState((prev) => ({
+                ...prev,
+                bookId: value?.id || "",
+                bookTitle: value?.label || "",
+              }));
+            }}
+            getOptionLabel={(option) => option.label || ""}
+            isOptionEqualToValue={(option, value) => option.id === value?.id}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Книга"
+                placeholder="Введите название книги"
+                fullWidth
+              />
+            )}
             fullWidth
-            margin="normal"
+            sx={{ mb: 2 }}
           />
+
           <TextField
-            label="ID Библиотеки"
+            select
+            label="Библиотека"
             value={formState.libraryId}
-            onChange={handleInputChange("libraryId")}
+            onChange={(e) =>
+              handleInputChange("libraryId")(null, e.target.value)
+            }
             fullWidth
             margin="normal"
-          />
+          >
+            {libraries?.map((library) => (
+              <MenuItem key={library.id} value={library.id}>
+                {library.name}
+              </MenuItem>
+            ))}
+          </TextField>
           <TextField
             label="Инвентарный номер"
             value={formState.inventoryNumber}
-            onChange={handleInputChange("inventoryNumber")}
+            onChange={(e) =>
+              handleInputChange("inventoryNumber")(null, e.target.value)
+            }
             fullWidth
             margin="normal"
           />
@@ -245,7 +339,7 @@ const Copies = () => {
             control={
               <Switch
                 checked={formState.available}
-                onChange={handleInputChange("available")}
+                onChange={(e) => handleInputChange("available")(e)}
               />
             }
             label="Доступен"
